@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de Fichas C21</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    .install-page {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .brand {
+      color: #b49b57;
+      font-weight: bold;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .bookmark-btn {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      padding: 15px 30px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+      cursor: grab;
+      margin: 20px 0;
+      border: 2px solid #b49b57;
+    }
+    .instructions {
+      text-align: left;
+      margin-top: 30px;
+      line-height: 1.6;
+      color: #444;
+    }
+    
+    /* PDF styles (hidden by default unless rendering) */
+    #ficha-container {
+      display: none;
+      background: #fff;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 20mm;
+      box-sizing: border-box;
+      position: relative;
+    }
+    @media print {
+      body { background: #fff; }
+      .install-page { display: none !important; }
+      #ficha-container { display: block !important; margin: 0; padding: 0; }
+    }
+    /* ... Insert all PDF CSS from previous code here ... */
+    .corner-logo { position: absolute; top: 15mm; right: 15mm; width: 120px; height: 120px; }
+    .header { text-align: center; margin-bottom: 25px; padding-bottom: 10px; margin-top: 10px; }
+    .header .adherido { font-size: 11px; color: #333; font-weight: 500; margin: 0 0 5px 0; }
+    .header h1 { margin: 0; font-size: 34px; color: #000; letter-spacing: 3px; font-weight: 700; }
+    .header h2 { margin: 5px 0; font-size: 18px; font-weight: 700; color: #000; }
+    .header .cucicba { font-size: 11px; color: #000; margin: 5px 0 15px 0; font-weight: 500; }
+    .contact-info { font-size: 11px; color: #222; margin-top: 5px; }
+    .content-wrapper { margin-top: 20px; display: flex; flex-direction: row; }
+    .sidebar { width: 32%; background: #e9e9e9; margin-right: 3%; padding-bottom: 20px; }
+    .section-title { font-size: 14px; font-weight: 700; color: #444; text-transform: uppercase; border-bottom: 3px solid #888; padding-bottom: 5px; margin-bottom: 15px; margin-top: 15px; margin-left: 15px; margin-right: 15px; }
+    .feature-list { list-style: none; padding: 0 15px 15px 15px; margin: 0; font-size: 12px; line-height: 1.6; }
+    .feature-list li { margin-bottom: 6px; }
+    .feature-list li::before { content: "•"; color: #000; display: inline-block; width: 1em; margin-left: -1em; font-weight: bold; }
+    .main-content { width: 65%; }
+    .main-image { width: 100%; height: 320px; object-fit: cover; margin-bottom: 15px; }
+    .location-title { text-align: center; font-size: 14px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; }
+    .location { text-align: center; font-size: 13px; margin-bottom: 25px; color: #333; }
+    .description-title { font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
+    .description { font-size: 12px; line-height: 1.6; color: #222; white-space: pre-wrap; text-align: justify; }
+    .gallery-section { clear: both; margin-top: 40px; }
+    .gallery-page-title { font-size: 14px; font-weight: bold; margin-bottom: 20px; margin-top: 10px; text-transform: uppercase; border-bottom: 2px solid #888; padding-bottom: 5px; }
+    .gallery-flex { display: flex; flex-wrap: wrap; gap: 15px; }
+    .gallery-img { width: calc(33.333% - 10px); height: 150px; object-fit: cover; page-break-inside: avoid; }
+  </style>
+</head>
+<body>
+
+  <!-- PÁGINA DE INSTALACIÓN -->
+  <div class="install-page" id="install-page">
+    <div class="brand">CENTURY 21® MAUVECIN</div>
+    <h2>Instalador del Generador de Fichas</h2>
+    <p>Hemos simplificado todo. Ya no necesitas servidores.</p>
+    
+    <a class="bookmark-btn" href="javascript:(function(){const getDomain=()=>window.location.hostname;const domain=getDomain();const result={title:document.title,price:'',expenses:'',location:'',description:'',features:[],images:[]};const imgElements=Array.from(document.querySelectorAll('img, source'));const images=imgElements.map((img)=>img.src||img.srcset?.split(' ')[0]||img.getAttribute('data-src')).filter((src)=>src&&(src.startsWith('http')||src.startsWith('https'))&&!src.startsWith('data:')).filter((src)=>{const lower=src.toLowerCase();return !lower.includes('logo')&&!lower.includes('icon')&&!lower.includes('avatar')&&!lower.includes('svg')&&!lower.includes('empresas')&&!lower.includes('naventcdn')&&!lower.includes('arrow')&&!lower.includes('publisher');});result.images=[...new Set(images)].slice(0,15);if(domain.includes('zonaprop')){const topBreadcrumb=document.querySelector('.title-type-sup-property');if(topBreadcrumb){result.title=topBreadcrumb.innerText.trim();}else{const h1=document.querySelector('h1.title-property, h2.title-location');if(h1)result.title=h1.innerText.trim();}const priceEl=document.querySelector('.price-item-container, .price-container-property, .price-items');if(priceEl){result.price=priceEl.innerText.replace(/\n/g,' ').trim();result.price=result.price.replace(/Avisarme si baja de precio/gi,'').trim();const expMatch=result.price.match(/Expensas \$ [0-9.]+/i);if(expMatch){result.price=result.price.replace(expMatch[0],'').trim();result.expenses=expMatch[0];}}const expEl=document.querySelector('.price-expenses, .expenses');if(expEl&&!result.expenses){result.expenses=expEl.innerText.trim();}result.location=document.querySelector('h2.title-location, .location-container, .title-location, .section-location-property')?.innerText||'';result.description=document.querySelector('.description-module__wrapper-description___2rEoY, [class*=\x22description-module\x22], #description-section, .property-description')?.innerText||'';if(result.description){result.description=result.description.replace(/Martin Lotti Brokers Inmobiliarios/gi,'').trim();result.description=result.description.replace(/Leer descripción completa/gi,'').trim();result.description=result.description.replace(/Ver descripción completa/gi,'').trim();}const html=document.documentElement.innerHTML;const stateFeatures=[];const featureRegex2=/\x22label\x22:\x22([^\x22]+)\x22,[^}]*\x22value\x22:([^\x2c]+)/g;let match2;while((match2=featureRegex2.exec(html))!==null){let label=match2[1];let value=match2[2];if(value.startsWith('\x22'))value=value.slice(1,-1);if(value==='null'||value===''){stateFeatures.push(label);}else{stateFeatures.push(`${label}: ${value}`);}}const imgRegex=/https?:\/\/[^\x22]+1200x1200[^\x22]+\.jpg/g;let highResImages=html.match(imgRegex)||[];highResImages=[...new Set(highResImages.map((url)=>url.replace('/resize','')))];let combinedImages=[...new Set([...result.images,...highResImages])];const url=window.location.href;const idMatch=url.match(/-(\d+)\.html/);const idPath=idMatch?idMatch[1].match(/.{1,2}/g).join('/'):null;if(idPath){combinedImages=combinedImages.filter((imgUrl)=>imgUrl.includes(idPath));}result.images=combinedImages.slice(0,30);const iconFeatures=Array.from(document.querySelectorAll('.main-features li, [class*=\x22features\x22] [class*=\x22feature\x22] span')).map((el)=>el.innerText.trim()).filter((t)=>t&&!t.includes('Zonaprop')&&!t.includes('Publicar'));result.features=[...new Set([...iconFeatures,...stateFeatures])];const excludeExact=['Ver más','Características generales','Servicios','Ambientes','Características','Disposición','Luminosidad','antigüedad','tot.','cub.','amb.','baño','dorm.'];result.features=result.features.filter((f)=>!f.includes('Zonaprop')&&!f.includes('Buscar inmobiliarias')&&!f.includes('Ingresar')&&!f.includes('Capital Federal')&&!excludeExact.includes(f));}if(result.features.length===0){result.features=['Sup. Total: 40m²','Ambientes: 2','Baños: 1'];}if(!result.price){result.price='Consultar Precio';}const payload=btoa(encodeURIComponent(JSON.stringify(result)));window.open('https://10-Joe.github.io/C.21/index.html#'+payload,'_blank');})();">
+      Arrastra este botón a tu barra de marcadores
+    </a>
+
+    <div class="instructions">
+      <h3>¿Cómo se usa?</h3>
+      <ol>
+        <li>Mantén presionado el botón negro de arriba y arrástralo hacia tu <b>barra de marcadores</b> (la barra blanca debajo de donde escribes las direcciones web).</li>
+        <li>Entra a ZonaProp y busca cualquier propiedad.</li>
+        <li>Una vez que estés viendo la propiedad en ZonaProp, <b>haz clic en el marcador que guardaste</b>.</li>
+        <li>¡Magia! Se abrirá una nueva pestaña con tu Ficha Técnica lista para imprimir como PDF.</li>
+      </ol>
+      <p style="color: #666; font-size: 12px; margin-top: 30px;">
+        Truco: Si no ves la barra de marcadores, presiona <b>Ctrl + Shift + B</b>.
+      </p>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR DE LA FICHA TÉCNICA -->
+  <div id="ficha-container">
+    <!-- Top Right Logo -->
+    <svg class="corner-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 50 10 A 40 40 0 1 1 20 80" stroke="#b49b57" stroke-width="6" fill="none" stroke-linecap="round" />
+      <text x="50" y="68" font-family="Arial" font-weight="bold" font-size="45" fill="#b49b57" text-anchor="middle">21</text>
+    </svg>
+
+    <!-- Header -->
+    <div class="header">
+      <p class="adherido">Adherido al sistema</p>
+      <h1>CENTURY 21<span style="font-size: 14px; vertical-align: super;">®</span></h1>
+      <h2>Mauvecin</h2>
+      <p class="cucicba">CMCDJLM 923 / CUCICBA 8439</p>
+      
+      <div class="contact-info">
+        Dr. Ricardo Balbín 4050, Saavedra, Capital Federal<br>
+        T (011)3621-2121 | contacto@c21mauvecin.com.ar | c21mauvecin.com.ar
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="section-title">Datos de la Propiedad</div>
+        <ul class="feature-list" id="ui-basic-data">
+          <!-- JS will fill this -->
+        </ul>
+
+        <div class="section-title">Datos Generales</div>
+        <ul class="feature-list" id="ui-features">
+          <!-- JS will fill this -->
+        </ul>
+      </div>
+
+      <!-- Main Image and Location -->
+      <div class="main-content">
+        <img src="" class="main-image" id="ui-main-image" style="display:none;" />
+        
+        <div class="location-title">UBICACIÓN DEL INMUEBLE</div>
+        <div class="location" id="ui-location"></div>
+        
+        <div class="description-title">DESCRIPCIÓN</div>
+        <div class="description" id="ui-description"></div>
+      </div>
+    </div>
+
+    <!-- Gallery Section -->
+    <div class="gallery-section">
+      <div class="gallery-page-title" id="ui-gallery-title">Catálogo de Fotos</div>
+      
+      <div class="gallery-flex" id="ui-gallery">
+        <!-- JS will fill this -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if there is data in the URL hash
+    if (window.location.hash && window.location.hash.length > 5) {
+      document.getElementById('install-page').style.display = 'none';
+      document.getElementById('ficha-container').style.display = 'block';
+
+      try {
+        const payload = window.location.hash.substring(1);
+        const jsonStr = decodeURIComponent(atob(payload));
+        const data = JSON.parse(jsonStr);
+
+        // Fill data
+        let basicDataHTML = '';
+        if (data.title) basicDataHTML += `<li><strong>Propiedad:</strong> ${data.title}</li>`;
+        basicDataHTML += `<li><strong>Precio:</strong> ${data.price || 'Consultar'}</li>`;
+        if (data.expenses) basicDataHTML += `<li><strong>Expensas:</strong> ${data.expenses}</li>`;
+        document.getElementById('ui-basic-data').innerHTML = basicDataHTML;
+
+        document.getElementById('ui-features').innerHTML = (data.features || []).map(f => `<li>${f}</li>`).join('');
+        
+        document.getElementById('ui-location').innerText = data.location || 'Ubicación a consultar';
+        document.getElementById('ui-description').innerText = data.description || 'Sin descripción.';
+        document.getElementById('ui-gallery-title').innerText = data.title || 'Catálogo de Fotos';
+
+        // Images
+        const validImages = Array.isArray(data.images) ? [...new Set(data.images)].filter(img => img && img.startsWith('http')) : [];
+        if (validImages.length > 0) {
+          const mainImg = document.getElementById('ui-main-image');
+          mainImg.src = validImages[0];
+          mainImg.style.display = 'block';
+        }
+
+        if (validImages.length > 1) {
+          const gallery = validImages.slice(1, 40).map(img => `<img src="${img}" class="gallery-img" />`).join('');
+          document.getElementById('ui-gallery').innerHTML = gallery;
+        }
+
+        // Wait a tiny bit for images to render then trigger print
+        setTimeout(() => {
+          window.print();
+        }, 1500);
+
+      } catch (err) {
+        alert("Hubo un error al procesar los datos de la propiedad.");
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
