@@ -1,5 +1,5 @@
 # Use official Node.js image (bullseye has the necessary dependencies for Puppeteer)
-FROM node:18-bullseye-slim
+FROM node:20-bullseye-slim
 
 # Install dependencies for Puppeteer (Chromium)
 RUN apt-get update \
