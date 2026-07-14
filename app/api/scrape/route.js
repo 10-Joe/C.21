@@ -65,18 +65,42 @@ function parseZonaPropHTML(html, url) {
       const props = nextData?.props?.pageProps;
       const posting = props?.posting || props?.listingData || props?.propertyData;
       if (posting) return parseFromNextData(posting);
-    } catch(e) {}
-  }
+function parseZonaPropHTML(html) {
+  const result = {
+    title: '',
+    price: 'Consultar Precio',
+    expenses: '',
+    location: '',
+    description: '',
+    features: [],
+    images: []
+  };
 
-  const titleMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/);
-  if (titleMatch) result.title = titleMatch[1].trim();
-  if (!result.title) {
-    const metaTitleMatch = html.match(/<title>([^<]+)<\/title>/);
-    if (metaTitleMatch) result.title = metaTitleMatch[1].replace(/\s*[\|\-]\s*ZonaProp.*$/i, '').trim();
+  const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+  if (titleMatch) {
+    result.title = titleMatch[1].replace(' - Zonaprop', '').trim();
   }
 
   const priceMatch = html.match(/(?:U\$S|USD|\$)\s*[\d\.]+/g);
   if (priceMatch) result.price = priceMatch[0];
+
+  const expensesMatch = html.match(/Expensas\s*\$?\s*[\d\.]+/i);
+  if (expensesMatch) result.expenses = expensesMatch[0];
+
+  // Try extracting location from JSON-LD
+  const ldMatch = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g);
+  if (ldMatch) {
+    ldMatch.forEach(m => {
+       try {
+         const jsonStr = m.replace(/<script[^>]*>/, '').replace(/<\/script>/, '');
+         const json = JSON.parse(jsonStr);
+         if (json.address) {
+            let locParts = [json.address.streetAddress, json.address.addressRegion, json.address.addressLocality].filter(Boolean);
+            result.location = locParts.join(', ').replace(', ,', ',').trim();
+         }
+       } catch (e) {}
+    });
+  }
 
   // Description from full container or meta
   const descDivMatch = html.match(/<div[^>]*data-qa="posting-description"[^>]*>([\s\S]*?)<\/div>/i) || 
@@ -115,9 +139,10 @@ function parseZonaPropHTML(html, url) {
 
   const imgRegex = /https?:\/\/[^"'\s]+1200x1200[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
   const foundImages = [...new Set(html.match(imgRegex) || [])];
-  const idMatch = url.match(/-(\d{6,12})\.html/);
-  if (idMatch) {
-    const idPath = idMatch[1].match(/.{1,2}/g)?.join('/');
+  
+  if (foundImages.length > 30) {
+    const idMatch = html.match(/\/(\d+)-/);
+    const idPath = idMatch ? `/${idMatch[1]}/` : '';
     result.images = idPath 
       ? foundImages.filter(img => img.includes(idPath)).slice(0, 30)
       : foundImages.slice(0, 30);
@@ -125,19 +150,28 @@ function parseZonaPropHTML(html, url) {
     result.images = foundImages.slice(0, 30);
   }
 
-  const featureRegex = /"label":"([^"]+)","value":"?([^",}]*)"?/g;
+  // Extract Features robustly
+  const featureRegex = /"label"\s*:\s*"([^"]+)"\s*,\s*"measure"\s*:\s*(?:"([^"]+)"|null)\s*,\s*"value"\s*:\s*(?:"([^"]+)"|null)/g;
   const features = new Set();
   let match;
   while ((match = featureRegex.exec(html)) !== null) {
     const label = match[1].trim();
-    const value = match[2].trim();
-    if (label && value && value !== 'null' && label.length < 50) {
-      features.add(value ? `${label}: ${value}` : label);
+    const measure = match[2];
+    const value = match[3];
+    
+    if (!label || label.length > 50) continue;
+    
+    let feat = label;
+    if (value && measure && measure !== 'null' && value !== 'null') feat = `${value} ${measure} ${label}`;
+    else if (value && value !== 'null') feat = `${label}: ${value}`;
+    
+    // Filter out common UI labels
+    if (!feat.includes('ZonaProp') && !feat.includes('Buscar') && !feat.includes('Publicar')) {
+      features.add(feat);
     }
   }
-  result.features = [...features].filter(f => 
-    !f.includes('ZonaProp') && !f.includes('Buscar') && !f.includes('Publicar')
-  ).slice(0, 20);
+  
+  result.features = [...features].slice(0, 20);
 
   return result;
 }
