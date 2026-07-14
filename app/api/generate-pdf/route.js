@@ -293,9 +293,11 @@ export async function POST(req) {
     const page = await browser.newPage();
     
     await page.setContent(htmlContent, { 
-      waitUntil: ['load', 'networkidle2'],
-      timeout: 45000 
+      waitUntil: 'load',
+      timeout: 30000 
     });
+    // Give images a few seconds to load
+    await new Promise(r => setTimeout(r, 3000));
 
     const pdfBuffer = await page.pdf({
       format: 'A4',
