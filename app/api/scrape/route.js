@@ -65,16 +65,8 @@ function parseZonaPropHTML(html, url) {
       const props = nextData?.props?.pageProps;
       const posting = props?.posting || props?.listingData || props?.propertyData;
       if (posting) return parseFromNextData(posting);
-function parseZonaPropHTML(html) {
-  const result = {
-    title: '',
-    price: 'Consultar Precio',
-    expenses: '',
-    location: '',
-    description: '',
-    features: [],
-    images: []
-  };
+    } catch(e) {}
+  }
 
   const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
   if (titleMatch) {
