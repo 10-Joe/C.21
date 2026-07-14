@@ -95,33 +95,44 @@ function parseZonaPropHTML(html, url) {
     });
   }
 
-  // Description from full container or meta
-  const descDivMatch = html.match(/<div[^>]*data-qa="posting-description"[^>]*>([\s\S]*?)<\/div>/i) || 
-                       html.match(/<div[^>]*id="longDescription"[^>]*>([\s\S]*?)<\/div>/i);
+  // Description from full container — try multiple selectors
+  const descDivMatch = html.match(/<div[^>]*class="section-description"[^>]*>([\s\S]*?)<\/div>/i) ||
+                       html.match(/<div[^>]*data-qa="posting-description"[^>]*>([\s\S]*?)<\/div>/i) || 
+                       html.match(/<div[^>]*id="longDescription"[^>]*>([\s\S]*?)<\/div>/i) ||
+                       html.match(/<div[^>]*id="reactDescription"[^>]*>([\s\S]*?)<\/div>/i);
                        
-  if (descDivMatch && descDivMatch[1]) {
-    let cleanDesc = descDivMatch[1]
+  if (descDivMatch && (descDivMatch[1] || descDivMatch[2] || descDivMatch[3] || descDivMatch[4])) {
+    let rawDesc = descDivMatch[1] || descDivMatch[2] || descDivMatch[3] || descDivMatch[4];
+    let cleanDesc = rawDesc
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/p>/gi, '\n\n')
       .replace(/<[^>]+>/g, '')
       .replace(/&nbsp;/g, ' ');
 
-    // Filter out unwanted competitor/publisher blocks
+    // Filter out unwanted competitor/publisher/legal blocks
     cleanDesc = cleanDesc.split('\n').filter(line => {
-      const lower = line.toLowerCase();
+      const lower = line.trim().toLowerCase();
+      if (!lower) return false;
       return !lower.includes('re/max') && 
              !lower.includes('remax') && 
              !lower.includes('zonaprop') && 
              !lower.includes('argenprop') && 
              !lower.includes('mercado libre') && 
              !lower.includes('inmobiliaria') &&
-             !lower.includes('propiedades') &&
              !lower.includes('matrícula') &&
              !lower.includes('matricula') &&
-             !lower.includes('cel 1') &&
              !lower.includes('ver datos') &&
              !lower.includes('cucicba') &&
-             !lower.includes('leer menos');
+             !lower.includes('leer menos') &&
+             !lower.includes('kiteprop') &&
+             !lower.includes('publicado usando') &&
+             !lower.includes('crm inmobiliario') &&
+             !lower.includes('toda la información del aviso') &&
+             !lower.includes('art. 973') &&
+             !lower.includes('estimativos') &&
+             !lower.includes('sujetos a modificación') &&
+             !lower.includes('- kp') &&
+             !lower.includes('- kpt');
     }).join('\n').trim();
 
     result.description = cleanDesc;
@@ -130,18 +141,19 @@ function parseZonaPropHTML(html, url) {
     if (descMatch) result.description = descMatch[1].replace(/RE\/MAX|Remax|Zonaprop|Argenprop/gi, '');
   }
 
-  const imgRegex = /https?:\/\/[^"'\s]+1200x1200[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
-  const foundImages = [...new Set(html.match(imgRegex) || [])];
-  
-  if (foundImages.length > 30) {
-    const idMatch = html.match(/\/(\d+)-/);
-    const idPath = idMatch ? `/${idMatch[1]}/` : '';
-    result.images = idPath 
-      ? foundImages.filter(img => img.includes(idPath)).slice(0, 30)
-      : foundImages.slice(0, 30);
-  } else {
-    result.images = foundImages.slice(0, 30);
+  // Extract images — get 1200x1200 first, fallback to 720x532
+  let imgRegex = /https?:\/\/[^"'\s]+1200x1200[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
+  let foundImages = [...new Set(html.match(imgRegex) || [])];
+  if (!foundImages.length) {
+    imgRegex = /https?:\/\/[^"'\s]+720x532[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
+    foundImages = [...new Set(html.match(imgRegex) || [])];
   }
+  if (!foundImages.length) {
+    imgRegex = /https?:\/\/[^"'\s]+360x266[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
+    foundImages = [...new Set(html.match(imgRegex) || [])];
+  }
+  // Filter only property images (from avisos path), skip logos/icons
+  result.images = foundImages.filter(img => img.includes('/avisos/')).slice(0, 30);
 
   // Extract Features robustly
   const featureRegex = /"label"\s*:\s*"([^"]+)"\s*,\s*"measure"\s*:\s*(?:"([^"]+)"|null)\s*,\s*"value"\s*:\s*(?:"([^"]+)"|null)/g;
