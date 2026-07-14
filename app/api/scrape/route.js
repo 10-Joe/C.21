@@ -39,6 +39,7 @@ export async function POST(req) {
     }
 
     const data = parseZonaPropHTML(html, url);
+    data._version = 'v2-features-location';
     return NextResponse.json(data);
 
   } catch (error) {
