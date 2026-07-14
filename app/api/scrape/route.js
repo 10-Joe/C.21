@@ -23,6 +23,11 @@ export async function POST(req) {
     });
 
     if (!response.ok) {
+      if (response.status === 410) {
+        return NextResponse.json({ 
+          error: "Esta propiedad ya no está disponible en ZonaProp (fue eliminada o expiró). Por favor usá un link vigente." 
+        }, { status: 200 });
+      }
       console.error("ScraperAPI error:", response.status, response.statusText);
       return NextResponse.json({ error: "ScraperAPI error: " + response.status }, { status: 500 });
     }
@@ -73,8 +78,22 @@ function parseZonaPropHTML(html, url) {
   const priceMatch = html.match(/(?:U\$S|USD|\$)\s*[\d\.]+/g);
   if (priceMatch) result.price = priceMatch[0];
 
-  const descMatch = html.match(/<meta name="description" content="([^"]+)"/);
-  if (descMatch) result.description = descMatch[1];
+  // Description from full container or meta
+  const descDivMatch = html.match(/<div[^>]*data-qa="posting-description"[^>]*>([\s\S]*?)<\/div>/i) || 
+                       html.match(/<div[^>]*id="longDescription"[^>]*>([\s\S]*?)<\/div>/i);
+                       
+  if (descDivMatch && descDivMatch[1]) {
+    result.description = descDivMatch[1]
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/RE\/MAX|Remax|Zonaprop|Argenprop|Mercado Libre|Inmobiliaria/gi, '')
+      .trim();
+  } else {
+    const descMatch = html.match(/<meta name="description" content="([^"]+)"/);
+    if (descMatch) result.description = descMatch[1].replace(/RE\/MAX|Remax|Zonaprop|Argenprop/gi, '');
+  }
 
   const imgRegex = /https?:\/\/[^"'\s]+1200x1200[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
   const foundImages = [...new Set(html.match(imgRegex) || [])];
@@ -138,7 +157,9 @@ function parseFromNextData(posting) {
     loc.state?.name
   ].filter(Boolean).join(', ');
 
-  result.description = posting.richDescription || posting.description || '';
+  result.description = (posting.richDescription || posting.description || '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/RE\/MAX|Remax|Zonaprop|Argenprop|Mercado Libre|Inmobiliaria/gi, '');
 
   const mainFeatures = posting.mainFeatures || [];
   const generalFeatures = posting.generalFeatures || posting.detailedFeatures || [];
