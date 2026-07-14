@@ -143,14 +143,18 @@ function parseZonaPropHTML(html, url) {
 
   // Extract images — get 1200x1200 first, fallback to 720x532
   let imgRegex = /https?:\/\/[^"'\s]+1200x1200[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
-  let foundImages = [...new Set(html.match(imgRegex) || [])];
+  let allMatches = (html.match(imgRegex) || []).map(url => url.replace('/resize', ''));
+  let foundImages = [...new Set(allMatches)];
+  
   if (!foundImages.length) {
     imgRegex = /https?:\/\/[^"'\s]+720x532[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
-    foundImages = [...new Set(html.match(imgRegex) || [])];
+    allMatches = (html.match(imgRegex) || []).map(url => url.replace('/resize', ''));
+    foundImages = [...new Set(allMatches)];
   }
   if (!foundImages.length) {
     imgRegex = /https?:\/\/[^"'\s]+360x266[^"'\s]*\.(?:jpg|jpeg|webp)/gi;
-    foundImages = [...new Set(html.match(imgRegex) || [])];
+    allMatches = (html.match(imgRegex) || []).map(url => url.replace('/resize', ''));
+    foundImages = [...new Set(allMatches)];
   }
   // Filter only property images (from avisos path), skip logos/icons
   result.images = foundImages.filter(img => img.includes('/avisos/')).slice(0, 30);
