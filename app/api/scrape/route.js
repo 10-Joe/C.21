@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
-puppeteer.use(StealthPlugin());
+export const dynamic = 'force-dynamic'; // Prevent static generation
 
 export async function POST(req) {
   try {
@@ -10,6 +8,14 @@ export async function POST(req) {
 
     if (!url) {
       return NextResponse.json({ error: "No URL provided" }, { status: 400 });
+    }
+
+    // Dynamic import to avoid Turbopack build errors
+    const puppeteer = (await import("puppeteer-extra")).default;
+    const StealthPlugin = (await import("puppeteer-extra-plugin-stealth")).default;
+    
+    if (!puppeteer._plugins || puppeteer._plugins.length === 0) {
+      puppeteer.use(StealthPlugin());
     }
 
     const browser = await puppeteer.launch({
