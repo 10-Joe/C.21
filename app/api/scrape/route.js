@@ -83,13 +83,31 @@ function parseZonaPropHTML(html, url) {
                        html.match(/<div[^>]*id="longDescription"[^>]*>([\s\S]*?)<\/div>/i);
                        
   if (descDivMatch && descDivMatch[1]) {
-    result.description = descDivMatch[1]
+    let cleanDesc = descDivMatch[1]
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/p>/gi, '\n\n')
       .replace(/<[^>]+>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/RE\/MAX|Remax|Zonaprop|Argenprop|Mercado Libre|Inmobiliaria/gi, '')
-      .trim();
+      .replace(/&nbsp;/g, ' ');
+
+    // Filter out unwanted competitor/publisher blocks
+    cleanDesc = cleanDesc.split('\n').filter(line => {
+      const lower = line.toLowerCase();
+      return !lower.includes('re/max') && 
+             !lower.includes('remax') && 
+             !lower.includes('zonaprop') && 
+             !lower.includes('argenprop') && 
+             !lower.includes('mercado libre') && 
+             !lower.includes('inmobiliaria') &&
+             !lower.includes('propiedades') &&
+             !lower.includes('matrícula') &&
+             !lower.includes('matricula') &&
+             !lower.includes('cel 1') &&
+             !lower.includes('ver datos') &&
+             !lower.includes('cucicba') &&
+             !lower.includes('leer menos');
+    }).join('\n').trim();
+
+    result.description = cleanDesc;
   } else {
     const descMatch = html.match(/<meta name="description" content="([^"]+)"/);
     if (descMatch) result.description = descMatch[1].replace(/RE\/MAX|Remax|Zonaprop|Argenprop/gi, '');
@@ -157,9 +175,26 @@ function parseFromNextData(posting) {
     loc.state?.name
   ].filter(Boolean).join(', ');
 
-  result.description = (posting.richDescription || posting.description || '')
+  let cleanDesc = (posting.richDescription || posting.description || '')
     .replace(/<[^>]+>/g, '')
-    .replace(/RE\/MAX|Remax|Zonaprop|Argenprop|Mercado Libre|Inmobiliaria/gi, '');
+    .replace(/&nbsp;/g, ' ');
+    
+  result.description = cleanDesc.split('\n').filter(line => {
+    const lower = line.toLowerCase();
+    return !lower.includes('re/max') && 
+           !lower.includes('remax') && 
+           !lower.includes('zonaprop') && 
+           !lower.includes('argenprop') && 
+           !lower.includes('mercado libre') && 
+           !lower.includes('inmobiliaria') &&
+           !lower.includes('propiedades') &&
+           !lower.includes('matrícula') &&
+           !lower.includes('matricula') &&
+           !lower.includes('cel 1') &&
+           !lower.includes('ver datos') &&
+           !lower.includes('cucicba') &&
+           !lower.includes('leer menos');
+  }).join('\n').trim();
 
   const mainFeatures = posting.mainFeatures || [];
   const generalFeatures = posting.generalFeatures || posting.detailedFeatures || [];
