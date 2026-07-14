@@ -13,7 +13,7 @@ export async function POST(req) {
     }
 
     // Use ScraperAPI to bypass Cloudflare - residential IPs that ZonaProp can't block
-    const scraperUrl = `https://api.scraperapi.com/?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&render=true&country_code=ar`;
+    const scraperUrl = `https://api.scraperapi.com/?api_key=${SCRAPER_API_KEY}&url=${encodeURIComponent(url)}&country_code=ar`;
 
     console.log("Fetching via ScraperAPI:", url);
     
