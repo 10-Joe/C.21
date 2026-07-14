@@ -28,7 +28,19 @@ export async function POST(req) {
     await page.setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
     
     // Go to URL and wait for DOM to load
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 45000 });
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
+
+    // Wait for Cloudflare "Just a moment..." challenge to pass (it usually takes 5-10 seconds)
+    try {
+      await page.waitForFunction(
+        () => document.title !== "Just a moment..." && document.title !== "Attention Required! | Cloudflare",
+        { timeout: 15000 }
+      );
+      // Wait extra time for the real page to fully render after the redirect
+      await new Promise(r => setTimeout(r, 5000));
+    } catch (e) {
+      console.log("Cloudflare wait timeout");
+    }
 
     // Scroll slightly to trigger lazy-loaded images
     await page.evaluate(async () => {
