@@ -1,0 +1,10 @@
+- `[x]` Detección de Mercado Libre en el endpoint `POST` (`app/api/scrape/route.js`).
+- `[x]` Función `parseMercadoLibreHTML` para extraer:
+  - `[x]` Título
+  - `[x]` Precio
+  - `[x]` Imágenes (HD)
+  - `[x]` Ubicación
+  - `[x]` Características y expensas
+  - `[x]` Descripción
+- `[/]` Testing del scraper de ML.
+- `[ ]` Push a GitHub y deploy en Render.

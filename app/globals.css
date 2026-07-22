@@ -37,8 +37,82 @@ h1 {
 p.subtitle {
   color: #666;
   text-align: center;
-  font-size: 1rem;
-  margin-bottom: 3rem;
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+  max-width: 600px;
+}
+
+/* Supported Portals Section */
+.supported-portals {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+
+.portals-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #999;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.portals-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  background: var(--c21-white);
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--c21-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portals-logos:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.portal-logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+}
+
+.portal-logo {
+  object-fit: contain;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+  filter: grayscale(20%) opacity(0.85);
+}
+
+.portal-logo-wrapper:hover .portal-logo {
+  filter: grayscale(0%) opacity(1);
+}
+
+.ml-logo {
+  height: 35px;
+}
+
+.zp-logo {
+  height: 28px;
+}
+
+.zp-icon {
+  height: 32px;
+  border-radius: 4px;
+}
+
+.portal-divider {
+  width: 1px;
+  height: 30px;
+  background-color: #e0e0e0;
 }
 
 /* Layout */
